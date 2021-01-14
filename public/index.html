@@ -61,22 +61,42 @@
 
   // ##########################
 
-  const SET_TIME = 'SET_TIME'
-  const SET_LOTS = 'SET_LOTS'
-  const CHANGE_LOT_PRICE = 'CHANGE_LOT_PRICE'
-
-  const initialState = {
-    time: new Date(),
-    lots: null
+  const clockInitialState = {
+    time: new Date()
   }
 
-  function appReducer (state, action) {
+  const SET_TIME = 'SET_TIME'
+
+  function clockReducer (state = clockInitialState, action) {
     switch (action.type) {
       case SET_TIME:
         return {
           ...state,
           time: action.time
         }
+      default:
+        return state
+    }
+  }
+
+  function setTime (time) {
+    return {
+      type: SET_TIME,
+      time
+    }
+  }
+
+  // ##########################
+
+  const auctionInitialState = {
+    lots: null
+  }
+
+  const SET_LOTS = 'SET_LOTS'
+  const CHANGE_LOT_PRICE = 'CHANGE_LOT_PRICE'
+
+  function auctionReducer (state = auctionInitialState, action) {
+    switch (action.type) {
       case SET_LOTS:
         return {
           ...state,
@@ -100,13 +120,6 @@
     }
   }
 
-  function setTime (time) {
-    return {
-      type: SET_TIME,
-      time
-    }
-  }
-
   function setLots (lots) {
     return {
       type: SET_LOTS,
@@ -125,7 +138,7 @@
   // ##########################
 
   class Store {
-    constructor (reducer, state = initialState) {
+    constructor (reducer, initialState) {
       this.reducer = reducer
       this.state = reducer(initialState, { type: null })
       this.listeners = []
@@ -149,7 +162,22 @@
     }
   }
 
-  const store = new Store(appReducer, initialState)
+  // ##########################
+
+  function combineReducers(reducers) {
+    return (state = {}, action) => {
+      const result = {};
+      Object.entries(reducers).forEach(([key, reducer]) => {
+        result[key] = reducer(state[key], action)
+      })
+      return result
+    }
+  }
+
+  const store = new Store(combineReducers({
+    clock: clockReducer,
+    auction: auctionReducer
+  }))
 
   // ##########################
 
@@ -157,8 +185,8 @@
     return (
       <div className="app">
         <Header />
-        <Clock time={state.time} />
-        <Lots lots={state.lots} />
+        <Clock time={state.clock.time} />
+        <Lots lots={state.auction.lots} />
       </div>
     )
   }
@@ -231,7 +259,6 @@
 
   setInterval(() => {
     store.dispatch(setTime(new Date()))
-
   }, 1000)
 
   api.get('/lots').then((lots) => {
