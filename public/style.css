@@ -78,6 +78,22 @@ body {
   margin: 0 0 15px 0;
 }
 
+button * {
+  vertical-align: middle;
+}
+
+button.favorite {
+  background: #fff;
+  border: 1px solid #999;
+  color: #000;
+}
+
+button.unfavorite {
+  background: #fff;
+  border: 1px solid #ff8c68;
+  color: #dc0000;
+}
+
 button {
   cursor: pointer;
   background: #fff;
