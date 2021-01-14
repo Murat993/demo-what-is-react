@@ -263,6 +263,15 @@
 
   // ##########################
 
+  const favorite = (id) => {
+    store.dispatch(favoriteLot(id))
+  }
+
+  const unfavorite = (id) => {
+    store.dispatch(unfavoriteLot(id))
+  }
+
+
   function renderView (state) {
     ReactDOM.render(
       <App state={state} />,
