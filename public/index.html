@@ -170,6 +170,10 @@
 
   // ##########################
 
+  const SET_TIME = 'SET_TIME'
+  const SET_LOTS = 'SET_LOTS'
+  const CHANGE_LOT_PRICE = 'CHANGE_LOT_PRICE'
+
   function appReducer (state, action) {
     switch (action.type) {
       case 'setTime':
@@ -202,21 +206,21 @@
 
   setInterval(() => {
     store.setState((state) => appReducer(state, {
-      type: 'setState',
+      type: SET_TIME,
       time: new Date()
     }))
   }, 1000)
 
   api.get('/lots').then((lots) => {
     store.setState((state) => appReducer(state, {
-      type: 'setLots',
+      type: SET_LOTS,
       lots
     }))
 
     lots.forEach((lot) => {
       stream.subscribe(`price-${lot.id}`, (data) => {
         store.setState((state) => appReducer(state, {
-          type: 'changeLotPrice',
+          type: CHANGE_LOT_PRICE,
           id: data.id,
           price: data.price
         }))
