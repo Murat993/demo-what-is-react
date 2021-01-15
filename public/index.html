@@ -206,12 +206,12 @@
 
   // ##########################
 
-  function App ({ state, favorite, unfavorite }) {
+  function App ({  time, lots, favorite, unfavorite }) {
     return (
       <div className="app">
         <Header />
-        <Clock time={state.clock.time} />
-        <Lots lots={state.auction.lots} favorite={favorite} unfavorite={unfavorite} />
+        <Clock time={time} />
+        <Lots lots={lots} favorite={favorite} unfavorite={unfavorite} />
       </div>
     )
   }
@@ -288,6 +288,9 @@
     const state = store.getState()
     const dispatch = store.dispatch
 
+    const time = state.clock.time
+    const lots = state.auction.lots
+
     const favorite = (id) => {
       api.post(`/lots/${id}/favorite`).then(() => {
         dispatch(favoriteLot(id))
@@ -302,7 +305,7 @@
 
 
     ReactDOM.render(
-      <App state={state} favorite={favorite} unfavorite={unfavorite} />,
+      <App time={time} lots={lots} favorite={favorite} unfavorite={unfavorite} />,
       document.getElementById('root')
     )
   }
