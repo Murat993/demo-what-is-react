@@ -206,7 +206,9 @@
 
   // ##########################
 
-  function App ({state, dispatch }) {
+  function App ({store}) {
+    const state = store.getState()
+    const dispatch = store.dispatch
 
     const time = state.clock.time
     const lots = state.auction.lots
@@ -301,27 +303,9 @@
   // ##########################
 
   function renderView (store) {
-    const state = store.getState()
-    const dispatch = store.dispatch
-
-    const time = state.clock.time
-    const lots = state.auction.lots
-
-    const favorite = (id) => {
-      api.post(`/lots/${id}/favorite`).then(() => {
-        dispatch(favoriteLot(id))
-      })
-    }
-
-    const unfavorite = (id) => {
-      api.post(`/lots/${id}/favorite`).then(() => {
-        dispatch(unfavoriteLot(id))
-      })
-    }
-
 
     ReactDOM.render(
-      <App state={state} dispatch={dispatch}/>,
+      <App store={store}/>,
       document.getElementById('root')
     )
   }
