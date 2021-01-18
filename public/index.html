@@ -72,7 +72,7 @@
     subscribe (channel, listener) {
       const match = /price-(\d+)/.exec(channel)
       if (match) {
-       const interval = setInterval(() => {
+        const interval = setInterval(() => {
           listener({
             id: parseInt(match[1]),
             price: Math.round((Math.random() * 10 + 30))
@@ -152,7 +152,7 @@
     }
   }
 
-  function loadLotsAsync() {
+  function loadLotsAsync () {
     return (dispatch, getState, { api }) => {
       api.get('/lots').then((lots) => {
         dispatch(setLots(lots))
@@ -211,7 +211,7 @@
   const thunk = ReduxThunk.default
 
   const store = Redux.createStore(
-    Redux.combineReducers({auction: auctionReducer}),
+    Redux.combineReducers({ auction: auctionReducer }),
     Redux.applyMiddleware(thunk.withExtraArgument({ api, stream }))
   )
 
@@ -222,7 +222,7 @@
       <div className="app">
         <Header />
         <ClockContainer />
-        <LotsConnected />
+        <LotsContainerConnected />
       </div>
     )
   }
@@ -240,13 +240,12 @@
   }
 
   function ClockContainer () {
-    const  [time, setTime] = React.useState(new Date())
+    const [time, setTime] = React.useState(new Date())
 
     React.useEffect(() => {
       const interval = setInterval(() => {
         setTime(new Date())
       }, 1000)
-
       return () => clearInterval(interval)
     }, [setTime])
 
@@ -264,17 +263,11 @@
     )
   }
 
-  const clockMapStateToProps = (state) => ({
-    time: state.clock.time
-  })
-
-  const ClockConnected = ReactRedux.connect(clockMapStateToProps)(Clock)
-
   function Loading () {
     return <div className="loading">Loading...</div>
   }
 
-  function Lots ({ lots, loaded, load }) {
+  function LotsContainer ({ lots, loaded, load }) {
     React.useEffect(() => {
       if (!loaded) {
         load()
@@ -285,28 +278,46 @@
       return <Loading />
     }
 
+    return <Lots lots={lots} />
+  }
+
+  const lotsContainerMapStateToProps = (state) => ({
+    lots: state.auction.lots,
+    loaded: state.auction.lots !== null
+  })
+
+  const lotsContainerMapDispatchToProps = {
+    load: loadLotsAsync
+  }
+
+  const LotsContainerConnected = ReactRedux.connect(
+    lotsContainerMapStateToProps,
+    lotsContainerMapDispatchToProps
+  )(LotsContainer)
+
+  function Lots ({ lots }) {
     return (
       <div className="lots">
-        {lots.map((lot) => <LotConnected lot={lot} key={lot.id} />)}
+        {lots.map((lot) => <LotContainerConnected lot={lot} key={lot.id} />)}
       </div>
     )
   }
 
-  const lotsMapStateToProps = (state) => ({
-    lots: state.auction.lots,
-    loaded: state.auction.lots !== null,
-  })
-
-  const lotsMapDispatchToProps = {
-    load: loadLotsAsync()
-  }
-
-  const LotsConnected = ReactRedux.connect(lotsMapStateToProps, lotsMapDispatchToProps)(Lots)
-
-  function Lot ({ lot, subscribe, favorite, unfavorite }) {
+  function LotContainer ({ lot, subscribe }) {
     React.useEffect(() => {
       return subscribe(lot.id)
     }, [lot.id])
+
+    return <LotConnected lot={lot} />
+  }
+
+  const lotContainerMapDispatchToProps = {
+    subscribe: subscribeToLotPrice
+  }
+
+  const LotContainerConnected = ReactRedux.connect(null, lotContainerMapDispatchToProps)(LotContainer)
+
+  function Lot ({ lot, favorite, unfavorite }) {
     return (
       <article className={'lot' + (lot.favorite ? ' favorite' : '')}>
         <div className="price">{lot.price}</div>
@@ -322,7 +333,6 @@
   }
 
   const lotMapDispatchToProps = {
-    subscribe: subscribeToLotPrice,
     favorite: favoriteLotAsync,
     unfavorite: unfavoriteLotAsync
   }
@@ -349,12 +359,6 @@
     </ReactRedux.Provider>,
     document.getElementById('root')
   )
-
-  // ##########################
-
-  setInterval(() => {
-    store.dispatch(setTime(new Date()))
-  }, 1000)
 
   // ##########################
 
