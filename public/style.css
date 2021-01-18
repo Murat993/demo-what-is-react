@@ -118,3 +118,18 @@ button {
   background: #ff5252;
   color: #fff;
 }
+
+button:disabled {
+  cursor: wait;
+}
+
+button.unfavorite:disabled {
+  border: 1px solid #ffc0ad;
+  color: #ff8c68;
+}
+
+button.favorite:disabled {
+  background: #fff;
+  border: 1px solid #ccc;
+  color: #ccc;
+}
