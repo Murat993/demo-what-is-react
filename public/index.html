@@ -258,13 +258,14 @@
   }
 
   function Lots ({ lots, load }) {
+    const loaded = lots !== null
     React.useEffect(() => {
-      if (lots === null) {
+      if (!loaded) {
         load()
       }
-    }, [lots])
+    }, [loaded])
 
-    if (lots === null) {
+    if (!loaded) {
       return <Loading />
     }
 
